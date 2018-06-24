@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ViewPropTypes } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TouchableNativeFeedback, ActivityIndicator, ViewPropTypes } from 'react-native';
 import PropTypes from 'prop-types';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -10,13 +10,19 @@ const propTypes = {
   textStyle: Text.propTypes.style,
   buttonStyle: PropTypes.any,
   disabled: PropTypes.bool,
+  disabledOpacity: PropTypes.number,
   onPress: PropTypes.func,
+  isThisActive: PropTypes.number,
+  buttonWidth: PropTypes.number,
+  buttonHeight: PropTypes.number,
 };
 const defaultProps = {
   type: 'primary',
-  // shape: 'round',
+  buttonWidth: 200,
+  buttonHeight: 50,
   text: 'Get Started',
   disabled: false,
+  disabledOpacity: 0.5,
 };
 
 export default class Buttons extends React.Component {
@@ -24,13 +30,23 @@ export default class Buttons extends React.Component {
   static defaultProps = defaultProps;
 
   render() {
-    const { text, buttonStyle, textStyle, type, shape, onPress } = this.props;
+    const { text, buttonStyle, buttonWidth, buttonHeight, textStyle, type, shape, onPress, disabledOpacity, disabled,  } = this.props;
+    const disabledStyle = disabled
+      ? { opacity: 0.5}
+      : null;
     let shapeStyle;
-    if (['round', 'circle'].includes(shape)) {
+
+    if (['round'].includes(shape)) {
       shapeStyle = {
-        borderRadius: 10,
+        borderRadius: buttonHeight / 4
       };
     }
+    if (['circle'].includes(shape)) {
+      shapeStyle = {
+        borderRadius: buttonHeight / 2
+      };
+    }
+
     let content;
     if (type === 'primary') {
       content = (
@@ -38,7 +54,8 @@ export default class Buttons extends React.Component {
           style={[
             styles.defaultButton,
             buttonStyle,
-            shapeStyle
+            shapeStyle,
+            disabledStyle
           ]}>
           <Text style={[styles.defaultText, textStyle]}>{text}</Text>
         </View>
@@ -71,7 +88,7 @@ export default class Buttons extends React.Component {
         </View>
       );
     }
-    else if (type === 'gmail') {
+    else if (type === 'google') {
       content = (
         <View
           style={[
@@ -115,9 +132,15 @@ export default class Buttons extends React.Component {
     }
     return (
       <TouchableOpacity
-        shape={shape}
+        disabled={disabled}
         onPress={onPress}
-        type={type}
+        style={[
+          styles.container,
+          {
+            width: buttonWidth,
+            height: buttonHeight,
+          },
+        ]}
       >
         {content}
       </TouchableOpacity>
@@ -126,6 +149,10 @@ export default class Buttons extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
@@ -146,14 +173,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#0C81BB',
   },
   defaultButton: {
-    flexDirection: 'row',
-    overflow: 'hidden',
+    flex: 1,
     padding: 8,
-    width: 200,
-    height: 50,
     backgroundColor: '#333333',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    flexDirection: 'row',
+
   },
   defaultText: {
     fontSize: 16,
